@@ -4,9 +4,9 @@ import categoryRoutes from "./category.route";
 import express from "express";
 
 const appRoute = (app: express.Application) => {
-  app.use("/books", bookRoutes);
-  app.use("/auth", authRoutes);
-  app.use("/category", categoryRoutes);
+  app.use("/api/books", bookRoutes);
+  app.use("/api/auth", authRoutes);
+  app.use("/api/category", categoryRoutes);
 };
 
 export default appRoute;
