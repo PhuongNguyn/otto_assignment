@@ -4,8 +4,14 @@ import Category from "../models/category.model";
 
 export const getPagingBook = async (req: Request, res: Response) => {
   try {
-    const books = await Book.find().limit(100);
-    res.status(200).json({ books });
+    const pageIndex = req.query.pageIndex ? Number(req.query.pageIndex) : 1;
+    const pageSize = 100;
+    const books = await Book.find()
+      .skip(pageSize * pageIndex - pageSize)
+      .limit(pageSize);
+
+    const countBooks = await Book.countDocuments();
+    res.status(200).json({ books, total: countBooks });
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
@@ -25,7 +31,7 @@ export const getBookById = async (req: Request, res: Response) => {
 };
 
 export const createBook = async (req: Request, res: Response) => {
-  const { title, price, author, category, discount } = req.body;
+  const { title, price, author, category, review, isbn } = req.body;
 
   // Check if category exists
   const validCategory = await Category.findById(category);
@@ -35,7 +41,7 @@ export const createBook = async (req: Request, res: Response) => {
     return;
   }
 
-  const book = new Book({ title, price, author, category, discount });
+  const book = new Book({ title, price, author, category, review, isbn });
 
   try {
     const newBook = await book.save();
