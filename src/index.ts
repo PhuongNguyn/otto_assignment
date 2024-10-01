@@ -4,6 +4,7 @@ import appRoute from "./routes";
 import setupSwagger from "./swagger";
 import seedCategories from "./utils/initCategory";
 import dotenv from "dotenv";
+import errorHandling from "./middlewares/error-handling.middleware";
 
 const app: Application = express();
 
@@ -22,6 +23,7 @@ setupSwagger(app);
 
 // Define routes
 appRoute(app);
+app.use(errorHandling);
 
 // Init some category
 seedCategories();

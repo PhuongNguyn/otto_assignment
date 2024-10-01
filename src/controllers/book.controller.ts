@@ -1,8 +1,12 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import Book from "../models/book.model";
 import Category from "../models/category.model";
 
-export const getPagingBook = async (req: Request, res: Response) => {
+export const getPagingBook = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const pageIndex = req.query.pageIndex ? Number(req.query.pageIndex) : 1;
     const pageSize = 100;
@@ -13,11 +17,15 @@ export const getPagingBook = async (req: Request, res: Response) => {
     const countBooks = await Book.countDocuments();
     res.status(200).json({ books, total: countBooks });
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
-export const getBookById = async (req: Request, res: Response) => {
+export const getBookById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const book = await Book.findById(req.params.id);
     if (!book) {
@@ -26,11 +34,15 @@ export const getBookById = async (req: Request, res: Response) => {
     }
     res.status(200).json({ book });
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
-export const createBook = async (req: Request, res: Response) => {
+export const createBook = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { title, price, author, category, review, isbn } = req.body;
 
   // Check if category exists
@@ -47,11 +59,15 @@ export const createBook = async (req: Request, res: Response) => {
     const newBook = await book.save();
     res.status(201).json({ newBook });
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
-export const updateBook = async (req: Request, res: Response) => {
+export const updateBook = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { category } = req.body;
 
@@ -63,22 +79,24 @@ export const updateBook = async (req: Request, res: Response) => {
         return;
       }
     }
-
     const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
-
     if (!updatedBook) {
       res.status(404).json({ message: "Book not found" });
       return;
     }
-    res.status(200).json({ book: updateBook });
+    res.status(200).json({ book: updatedBook });
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
 
-export const deleteBook = async (req: Request, res: Response) => {
+export const deleteBook = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const deletedBook = await Book.findByIdAndDelete(req.params.id);
     if (!deletedBook) {
@@ -87,6 +105,6 @@ export const deleteBook = async (req: Request, res: Response) => {
     }
     res.status(200).json({ message: "Book deleted" });
   } catch (err: any) {
-    res.status(500).json({ message: err.message });
+    next(err);
   }
 };
